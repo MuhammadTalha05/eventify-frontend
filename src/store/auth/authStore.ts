@@ -53,17 +53,38 @@ export const useAuthStore = create<AuthState>()(
                 }
             },
 
+            // refreshAccessToken: async () => {
+            //     if (get().refreshInProgress || !get().user) return;
+            //     set({ refreshInProgress: true });
+            //     try {
+            //       await API.get("/api/auth/token/refresh");
+            //       await get().fetchUser();
+            //     } catch (error) {
+            //       console.error("Failed to refresh token", error);
+            //       get().clearAuth();
+            //     } finally {
+            //       set({ refreshInProgress: false });
+            //     }
+            // },
+
+
             refreshAccessToken: async () => {
-                if (get().refreshInProgress || !get().user) return;
+                const state = get();
+                if (state.refreshInProgress || !state.user) return;
+                
                 set({ refreshInProgress: true });
                 try {
-                  await API.get("/api/auth/token/refresh");
-                  await get().fetchUser();
+                    console.log("Refreshing access token...");
+                    await API.get("/api/auth/token/refresh");
+                    console.log("Token refreshed successfully");
+                    // Now fetch user with the new token
+                    await get().fetchUser();
                 } catch (error) {
-                  console.error("Failed to refresh token", error);
-                  get().clearAuth();
+                    console.error("Failed to refresh token", error);
+                    get().clearAuth();
+                    throw error; // Re-throw to let interceptor know refresh failed
                 } finally {
-                  set({ refreshInProgress: false });
+                    set({ refreshInProgress: false });
                 }
             },
 
