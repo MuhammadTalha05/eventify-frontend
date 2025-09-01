@@ -15,19 +15,18 @@ function AuthPageContent() {
   const searchParams = useSearchParams();
   const mode = searchParams.get("mode") || "login"; // default is signin
 
-  // const { user, refreshAccessToken } = useAuthStore();
-  const { user } = useAuthStore();
+  const { user, refreshAccessToken } = useAuthStore();
 
 
   useEffect(() => {
     const protectRoute = async () => {
       if (user) {
-        // await refreshAccessToken();
+        await refreshAccessToken();
         router.push("/"); // redirect logged-in user to home
       }
     };
     protectRoute();
-  }, [user, router]);
+  }, [user, refreshAccessToken, router]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-10">
