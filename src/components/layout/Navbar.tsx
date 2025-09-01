@@ -21,9 +21,9 @@ export default function Navbar() {
   useEffect(() => {
     const initAuth = async () => {
       const authStore = useAuthStore.getState();
-      // if (authStore.user) {
-      //   await authStore.refreshAccessToken();
-      // }
+      if (authStore.user) {
+        await authStore.refreshAccessToken();
+      }
       setReady(true);
     };
     initAuth();
