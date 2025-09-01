@@ -38,7 +38,7 @@ API.interceptors.response.use(
 
     const { refreshAccessToken, user } = useAuthStore.getState();
 
-    if (error.response?.status === 401 && !originalRequest._retry && user) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
         await refreshAccessToken(); // refresh token using cookies
