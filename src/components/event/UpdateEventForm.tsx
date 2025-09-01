@@ -39,18 +39,18 @@ const uploadToCloudinary = async (file: File): Promise<string> => {
 };
 
 export default function UpdateEventForm({ eventId, initialData, onCancel, onSubmit }: UpdateEventFormProps) {
-    if (!initialData) return null;
+    // if (!initialData) return null;
 
     const { deleteAttachment, deleteHost } = useUserStore();
 
-    const [featuredPreview, setFeaturedPreview] = useState<string | null>(initialData.featuredImage || null);
-    const [featuredUrl, setFeaturedUrl] = useState<string | null>(initialData.featuredImage || null);
+    const [featuredPreview, setFeaturedPreview] = useState<string | null>(initialData?.featuredImage || null);
+    const [featuredUrl, setFeaturedUrl] = useState<string | null>(initialData?.featuredImage || null);
     const [featuredLoading, setFeaturedLoading] = useState(false);
 
     const [attachmentsPreviews, setAttachmentsPreviews] = useState<AttachmentPreview[]>(
-        (initialData.attachments || []).map((a: any) => ({ id: a.id || generateId(), preview: a.fileUrl }))
+        (initialData?.attachments || []).map((a: any) => ({ id: a.id || generateId(), preview: a.fileUrl }))
     );
-    const [attachmentsUrls, setAttachmentsUrls] = useState<Attachment[]>(initialData.attachments || []);
+    const [attachmentsUrls, setAttachmentsUrls] = useState<Attachment[]>(initialData?.attachments || []);
     const [attachmentsLoading, setAttachmentsLoading] = useState<Record<string, boolean>>({});
     const [newAttachments, setNewAttachments] = useState<Attachment[]>([]);
 
@@ -60,12 +60,14 @@ export default function UpdateEventForm({ eventId, initialData, onCancel, onSubm
     const [emailError, setEmailError] = useState("");
 
     // ✅ Track existing hosts from DB (with ids)
-    const [existingHosts, setExistingHosts] = useState<Host[]>(initialData.hosts || []);
+    const [existingHosts, setExistingHosts] = useState<Host[]>(initialData?.hosts || []);
 
     // ✅ Track *all* emails (existing + new) for display
     const [allHostEmails, setAllHostEmails] = useState<string[]>([
-        ...(initialData.hosts || []).map((h: Host) => h.email),
+        ...(initialData?.hosts || []).map((h: Host) => h.email),
     ]);
+
+    if (!initialData) return null;
 
     const handleFeaturedChange = async (file: File, setFieldValue: (field: string, value: any) => void) => {
         if (file.type === "image/svg+xml") return toast.error("❌ SVG files not allowed");
