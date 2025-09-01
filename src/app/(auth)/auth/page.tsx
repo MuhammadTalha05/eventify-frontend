@@ -1,7 +1,6 @@
-// src/app/(auth)/auth/page.tsx
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import SignupForm from "@/components/auth/SignupForm";
 import SigninForm from "@/components/auth/SigninForm";
@@ -11,7 +10,7 @@ import eventImage from "@/assets/eventImage.webp";
 import Image from "next/image";
 import { useAuthStore } from "@/store/auth/authStore";
 
-export default function AuthPage() {
+function AuthPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const mode = searchParams.get("mode") || "login"; // default is signin
@@ -20,7 +19,6 @@ export default function AuthPage() {
 
   useEffect(() => {
     const protectRoute = async () => {
-      // Refresh token if user exists in store (optional)
       if (user) {
         await refreshAccessToken();
         router.push("/"); // redirect logged-in user to home
@@ -32,7 +30,7 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-10">
       <div className="grid grid-cols-1 xl:grid-cols-2 w-full max-w-6xl">
-        {/* Left Column: Image (only on xl and above) */}
+        {/* Left Column: Image */}
         <div className="hidden xl:block relative w-full min-h-[500px]">
           <Image
             src={eventImage}
@@ -50,7 +48,7 @@ export default function AuthPage() {
             ) : mode === "otp" ? (
               <OtpForm />
             ) : mode === "forgot" ? (
-              <ForgotPasswordForm />  
+              <ForgotPasswordForm />
             ) : (
               <SigninForm />
             )}
@@ -58,5 +56,19 @@ export default function AuthPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <p className="text-gray-500">Loading...</p>
+        </div>
+      }
+    >
+      <AuthPageContent />
+    </Suspense>
   );
 }
