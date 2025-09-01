@@ -31,75 +31,29 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             refreshInProgress: false,
 
-            // fetchUser: async () => {
-            //     try {
-            //         set({ isLoading: true });
-            //         const res = await API.get("/api/user/profile/me");
-            //         set({ user: res.data.data, isLoading: false });
-            //     } catch (error) {
-            //         set({ user: null, isLoading: false });
-            //     }
-            // },
             fetchUser: async () => {
                 try {
                     set({ isLoading: true });
                     const res = await API.get("/api/user/profile/me");
                     set({ user: res.data.data, isLoading: false });
                 } catch (error) {
-                    console.error("Fetch user failed", error);
-                    // CRITICAL FIX: Don't set user to null on error
-                    // Let the interceptor handle authentication failures
-                    set({ isLoading: false });
+                    set({ user: null, isLoading: false });
                 }
             },
 
-            // refreshAccessToken: async () => {
-            //     if (get().refreshInProgress || !get().user) return;
-            //     set({ refreshInProgress: true });
-            //     try {
-            //       await API.get("/api/auth/token/refresh");
-            //       await get().fetchUser();
-            //     } catch (error) {
-            //       console.error("Failed to refresh token", error);
-            //       get().clearAuth();
-            //     } finally {
-            //       set({ refreshInProgress: false });
-            //     }
-            // },
-
-
-           refreshAccessToken: async () => {
-                const state = get();
-                
-                // ONLY check if refresh is already in progress
-                // REMOVED the !state.user check - this is the key fix!
-                if (state.refreshInProgress) {
-                    console.log("Refresh already in progress, skipping...");
-                    return;
-                }
-                
-                console.log("Starting token refresh...");
+            refreshAccessToken: async () => {
+                if (get().refreshInProgress || !get().user) return;
                 set({ refreshInProgress: true });
-                
                 try {
-                    // First, try to refresh the token using the refresh cookie
-                    await API.get("/api/auth/token/refresh");
-                    console.log("Token refreshed successfully");
-                    
-                    // Then try to get the user with the new token
-                    await get().fetchUser();
-                    console.log("User fetched after refresh");
-                    
+                  await API.get("/api/auth/token/refresh");
+                  await get().fetchUser();
                 } catch (error) {
-                    console.error("Failed to refresh token", error);
-                    // Only clear auth if refresh truly failed
-                    get().clearAuth();
-                    throw error;
+                  console.error("Failed to refresh token", error);
+                  get().clearAuth();
                 } finally {
-                    set({ refreshInProgress: false });
+                  set({ refreshInProgress: false });
                 }
             },
-
 
             clearAuth: async () => {
                 try {
