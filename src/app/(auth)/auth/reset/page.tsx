@@ -1,16 +1,19 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import ResetPasswordForm from "@/components/auth/ResetPasswordForm";
 
-export default function ResetPasswordPage() {
+function ResetPasswordPageContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
   if (!token) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-red-500 font-medium">Invalid or missing reset link.</p>
+        <p className="text-red-500 font-medium">
+          Invalid or missing reset link.
+        </p>
       </div>
     );
   }
@@ -24,5 +27,19 @@ export default function ResetPasswordPage() {
         <ResetPasswordForm token={token} />
       </div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <p className="text-gray-500">Loading...</p>
+        </div>
+      }
+    >
+      <ResetPasswordPageContent />
+    </Suspense>
   );
 }

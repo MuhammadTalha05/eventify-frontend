@@ -2,7 +2,6 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
 import { API } from "@/lib/api";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
