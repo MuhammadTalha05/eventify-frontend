@@ -35,8 +35,11 @@ export default function EventsPage() {
 
   const events = query.data?.data ?? [];
   const totalPages = query.data?.pagination?.totalPages ?? 1;
-  const isLoading = query.isLoading;
-  const isError = query.isError;
+
+  // ✅ Only show ACTIVE events
+  const activeEvents = events.filter(
+    (event: Event) => event.status === "ACTIVE"
+  );
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
@@ -56,28 +59,30 @@ export default function EventsPage() {
       </div>
 
       {/* Loader */}
-      {isLoading && <Loader />}
+      {query.isLoading && <Loader />}
 
       {/* Error */}
-      {isError && <EmptyState message="Failed to load events. Please try again." />}
+      {query.isError && (
+        <EmptyState message="Failed to load events. Please try again." />
+      )}
 
       {/* No events */}
-      {!isLoading && events.length === 0 && (
-        <EmptyState message="No events available at the moment." />
+      {!query.isLoading && activeEvents.length === 0 && (
+        <EmptyState message="No active events available at the moment." />
       )}
 
       {/* Event Grid */}
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {events.map((event: Event) => (
+        {activeEvents.map((event: Event) => (
           <EventCard key={event.id} event={event} />
         ))}
       </div>
 
       {/* Pagination */}
-      {(totalPages || 1) > 0 && (
+      {totalPages >= 1 && (
         <Pagination
           currentPage={page}
-          totalPages={totalPages || 1}
+          totalPages={totalPages}
           onPageChange={setPage}
         />
       )}

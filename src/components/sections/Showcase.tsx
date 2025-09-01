@@ -1,7 +1,26 @@
+"use client";
+
 import Image from "next/image";
-import showcase from "@/assets/showcase.png"
+import showcase from "@/assets/showcase.png";
+import { useAuthStore } from "@/store/auth/authStore";
+import { useRouter } from "next/navigation";
 
 export default function Showcase() {
+  const { user } = useAuthStore();
+  const router = useRouter();
+
+  const handleStartHosting = () => {
+    if (user?.role === "SUPER_ADMIN") {
+      router.push("/super-admin/dashboard");
+    } else if (user?.role === "ORGANIZER") {
+      router.push("/organizer/dashboard");
+    } else if (user?.role === "PARTICIPANT") {
+      router.push("/participant/dashboard");
+    } else {
+      router.push("/auth?mode=login");
+    }
+  };
+
   return (
     <section id="showcase" className="py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
@@ -9,7 +28,7 @@ export default function Showcase() {
         <div className="relative w-full h-80 lg:h-[420px]">
           <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-indigo-100 via-transparent to-indigo-50 blur-xl"></div>
           <Image
-            src={showcase} // 👉 replace with real asset
+            src={showcase}
             alt="Event showcase"
             fill
             className="object-contain relative z-10"
@@ -36,12 +55,13 @@ export default function Showcase() {
             interaction, Eventify delivers a smooth and enjoyable experience for
             everyone.
           </p>
-          <a
-            href="#roles"
-            className="mt-8 inline-block rounded-xl bg-indigo-600 px-8 py-3 text-white font-semibold hover:bg-indigo-700 shadow-md transition"
+
+          <button
+            onClick={handleStartHosting}
+            className="mt-8 inline-block rounded-xl cursor-pointer bg-indigo-600 px-8 py-3 text-white font-semibold hover:bg-indigo-700 shadow-md transition"
           >
             Start Hosting
-          </a>
+          </button>
         </div>
       </div>
     </section>

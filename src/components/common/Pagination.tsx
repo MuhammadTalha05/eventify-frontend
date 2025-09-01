@@ -41,7 +41,7 @@ const Pagination: FC<PaginationProps> = ({
       ))}
 
       <button
-        className="px-3 py-1 rounded-lg border bg-white hover:bg-gray-100 disabled:opacity-50"
+        className="px-3 py-1 rounded-lg border cursor-pointer bg-white hover:bg-gray-100 disabled:opacity-50"
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
       >
