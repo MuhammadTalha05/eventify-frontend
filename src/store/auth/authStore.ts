@@ -31,13 +31,25 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             refreshInProgress: false,
 
+            // fetchUser: async () => {
+            //     try {
+            //         set({ isLoading: true });
+            //         const res = await API.get("/api/user/profile/me");
+            //         set({ user: res.data.data, isLoading: false });
+            //     } catch (error) {
+            //         set({ user: null, isLoading: false });
+            //     }
+            // },
             fetchUser: async () => {
                 try {
                     set({ isLoading: true });
                     const res = await API.get("/api/user/profile/me");
                     set({ user: res.data.data, isLoading: false });
                 } catch (error) {
-                    set({ user: null, isLoading: false });
+                    console.error("Fetch user failed", error);
+                    // CRITICAL FIX: Don't set user to null on error
+                    // Let the interceptor handle authentication failures
+                    set({ isLoading: false });
                 }
             },
 
