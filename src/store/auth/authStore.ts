@@ -42,7 +42,7 @@ export const useAuthStore = create<AuthState>()(
             },
 
             refreshAccessToken: async () => {
-                if (get().refreshInProgress || !get().user) return;
+                // if (get().refreshInProgress || !get().user) return;
                 set({ refreshInProgress: true });
                 try {
                   await API.get("/api/auth/token/refresh");
