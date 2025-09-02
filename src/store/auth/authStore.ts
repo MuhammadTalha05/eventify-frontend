@@ -18,6 +18,7 @@ type AuthState = {
     fetchUser: () => Promise<void>;
     refreshAccessToken: () => Promise<void>;
     clearAuth: () => void;
+    initAuth: () => void;
     redirectByRole: () => void;
     // New setter to update user locally
     setUser: (user: User) => void;
@@ -43,17 +44,17 @@ export const useAuthStore = create<AuthState>()(
 
             refreshAccessToken: async () => {
                 // if (get().refreshInProgress || !get().user) return;
-                console.log("Get REfresh token  ............",get().refreshInProgress);
+                console.log("Get REfresh token  ............", get().refreshInProgress);
                 if (get().refreshInProgress) return;
                 set({ refreshInProgress: true });
                 try {
-                  await API.get("/api/auth/token/refresh");
-                  await get().fetchUser();
+                    await API.get("/api/auth/token/refresh");
+                    await get().fetchUser();
                 } catch (error) {
-                  console.error("Failed to refresh token", error);
-                  get().clearAuth();
+                    console.error("Failed to refresh token", error);
+                    get().clearAuth();
                 } finally {
-                  set({ refreshInProgress: false });
+                    set({ refreshInProgress: false });
                 }
             },
 
@@ -67,6 +68,11 @@ export const useAuthStore = create<AuthState>()(
                 }
             },
 
+            initAuth: () => {
+                // reset transient states on reload
+                set({ refreshInProgress: false, isLoading: false });
+            },
+
             redirectByRole: () => {
                 const user = get().user;
                 if (!user) return;
@@ -77,7 +83,7 @@ export const useAuthStore = create<AuthState>()(
 
             setUser: (user: User) => set({ user }),
 
-             // Add Accoutn For Soneone Else
+            // Add Accoutn For Soneone Else
             addUser: async (data) => {
                 try {
                     const res = await API.post("/api/auth/admin/create-account", data);
