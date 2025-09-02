@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { API } from "@/lib/api";
+import type { AxiosError } from "axios";
 
 type User = {
     id: string;
@@ -42,21 +43,42 @@ export const useAuthStore = create<AuthState>()(
                 }
             },
 
+            // refreshAccessToken: async () => {
+            //     // if (get().refreshInProgress || !get().user) return;
+            //     console.log("Get REfresh token  ............", get().refreshInProgress);
+            //     if (get().refreshInProgress) return;
+            //     set({ refreshInProgress: true });
+            //     try {
+            //         await API.get("/api/auth/token/refresh");
+            //         await get().fetchUser();
+            //     } catch (error) {
+            //         console.error("Failed to refresh token", error);
+            //         get().clearAuth();
+            //     } finally {
+            //         set({ refreshInProgress: false });
+            //     }
+            // },
+
             refreshAccessToken: async () => {
-                // if (get().refreshInProgress || !get().user) return;
-                console.log("Get REfresh token  ............", get().refreshInProgress);
+                console.log("Error ....................",get().refreshInProgress )
                 if (get().refreshInProgress) return;
                 set({ refreshInProgress: true });
+
                 try {
                     await API.get("/api/auth/token/refresh");
                     await get().fetchUser();
-                } catch (error) {
+                } catch (err) {
+                    const error = err as AxiosError; // 👈 cast correctly
                     console.error("Failed to refresh token", error);
-                    get().clearAuth();
+
+                    if (error.response?.status === 401 || error.response?.status === 403) {
+                        get().clearAuth();
+                    }
                 } finally {
                     set({ refreshInProgress: false });
                 }
             },
+
 
             clearAuth: async () => {
                 try {
@@ -68,11 +90,18 @@ export const useAuthStore = create<AuthState>()(
                 }
             },
 
-            initAuth: () => {
-                // reset transient states on reload
-                set({ refreshInProgress: false, isLoading: false });
-            },
+            initAuth: async () => {
+                set({ refreshInProgress: false, isLoading: true });
 
+                try {
+                    // Try refreshing access token first
+                    await get().refreshAccessToken();
+                } catch (err) {
+                    console.warn("InitAuth: refresh token failed", err);
+                } finally {
+                    set({ isLoading: false });
+                }
+            },
             redirectByRole: () => {
                 const user = get().user;
                 if (!user) return;
