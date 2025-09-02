@@ -14,6 +14,7 @@ export const API = axios.create({
 API.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
+    console.log("error", error)
     const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
 
     const { refreshAccessToken, user } = useAuthStore.getState();
