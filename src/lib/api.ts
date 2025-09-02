@@ -15,14 +15,19 @@ API.interceptors.response.use(
     const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
 
     const { refreshAccessToken, user } = useAuthStore.getState();
-    console.log("",)
-
+    
+    console.log("In interceptor",)
+    
     if (error.response?.status === 401 && !originalRequest._retry && user) {
+      console.log("Inside interceptor",)
       originalRequest._retry = true;
       try {
-        await refreshAccessToken(); // refresh token using cookies
+          await API.get("/api/auth/token/refresh");
+        // await refreshAccessToken(); // refresh token using cookies
+        
         return API(originalRequest); // retry original request
       } catch (err) {
+        console.log("Refrsh error //////////////  ", error)
         // if refresh fails, user will be logged out automatically
         return Promise.reject(err);
       }
@@ -31,4 +36,26 @@ API.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+// API.interceptors.response.use(
+//   (response) => response,
+//   async (error: AxiosError) => {
+//     const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
+
+//     const { refreshAccessToken, user } = useAuthStore.getState();
+//     console.log("",)
+
+//     if (error.response?.status === 401 && !originalRequest._retry && user) {
+//       originalRequest._retry = true;
+//       try {
+//         await refreshAccessToken(); // refresh token using cookies
+//         return API(originalRequest); // retry original request
+//       } catch (err) {
+//         // if refresh fails, user will be logged out automatically
+//         return Promise.reject(err);
+//       }
+//     }
+
+//     return Promise.reject(error);
+//   }
+// );
 
