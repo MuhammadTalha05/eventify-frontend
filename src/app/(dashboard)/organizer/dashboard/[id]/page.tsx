@@ -65,7 +65,11 @@ export default function EventDetailPage() {
 
     const openModal = (participant: any) => {
         setSelectedParticipant(participant);
-        setNewStatus(participant.status || "PENDING");
+        if (participant.status === "PENDING") {
+            setNewStatus("APPROVED");
+        } else {
+            setNewStatus(participant.status as "APPROVED" | "REJECTED");
+        }
         setIsModalOpen(true);
     };
 
