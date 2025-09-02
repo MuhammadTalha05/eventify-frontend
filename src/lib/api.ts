@@ -14,12 +14,8 @@ export const API = axios.create({
 API.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    console.log("error", error)
     const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
-
     const { refreshAccessToken, user } = useAuthStore.getState();
-    console.log("",)
-
     if (error.response?.status === 401 && !originalRequest._retry && user) {
       originalRequest._retry = true;
       try {
